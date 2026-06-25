@@ -1,12 +1,16 @@
 package tp1.logic.gameobjects;
 
 import tp1.logic.GameWorld;
+import tp1.exceptions.ObjectParseException;
+import tp1.exceptions.OffBoardException;
 import tp1.logic.Direction;
 import tp1.logic.lemmingRoles.*;
 import tp1.view.Messages;
 import tp1.logic.Position;
 
 public class Lemming extends GameObject{
+	
+	private static final String name="Lemming";
 	private Direction dir;
 	private LemmingRole role;
 	
@@ -16,18 +20,41 @@ public class Lemming extends GameObject{
 		this.role=r;
 	}
 	
+	public Lemming(GameWorld g, Position p,Direction d,int a,LemmingRole r) {
+		super(g,p);
+		this.dir=d;
+		this.role=r;
+		role.setFall(a);
+	}
+	
+	public Lemming() {
+		super();
+	}
+
+	public Lemming(Lemming other) {
+		super(other.game,other.pos);
+		this.dir=other.dir;
+		this.role=other.role.clone();
+	}
+
+	public Lemming clone() {
+		return new Lemming(this);
+	}
+	
 	@Override
 	public void update() {
-		role.start(this);
+		game.receiveInteractionsFrom(this);
 		if(this.isAlive) {
+			role.start(this);
 			role.play(this);
-		}
 		if(!this.dentroDelTablero(this.pos))
-			isAlive=false;
+			this.dead();
+		}
 	}
 	
 	public void dead() {
 		isAlive=false;
+		game.dead();
 	}
 		
 	public boolean isInAir() {
@@ -35,10 +62,7 @@ public class Lemming extends GameObject{
 	}
 	
 	public void downcaver() {
-		Position aux=new Position(pos.getX(),pos.getY()+1);
-		game.removeWall(aux);
-		pos.operador(0, 1);
-		
+		pos.operador(0,1);
 	}
 	
 	public void parachute() {
@@ -61,27 +85,14 @@ public class Lemming extends GameObject{
 	}
 	
 	public void move() {
-		if(this.isAlive) {
-			Position p = new Position(pos.getX(),pos.getY());
-			if(this.dir.equals(Direction.RIGHT))
-				p.operador(1, 0);
-			else 
-				if(this.dir.equals(Direction.LEFT))
-					p.operador(-1, 0);	
-				else 
-					if(this.dir.equals(Direction.UP))
-						p.operador(0, -1);
-					else 
-						if(this.dir.equals(Direction.DOWN))
-							p.operador(0, 1);
-			if(game.isSolid(p) || p.getX()==0 || p.getX()==10) {
+			Position p = new Position(pos.getCol()+dir.getCol(),pos.getFila()+dir.getFila());
+			if(game.isSolid(p) || p.getCol()==-1 || p.getCol()==10) {
 				if(this.dir.equals(Direction.RIGHT))
 					this.dir=Direction.LEFT;
 				else this.dir=Direction.RIGHT;
 				}
 			else
-				super.pos=p;
-		}
+				pos=p;
 	}
 	
 	@Override
@@ -94,9 +105,6 @@ public class Lemming extends GameObject{
 	}
 
 	public void disableRole() { this.role=new WalkerRole(); }
-	
-	@Override
-	public boolean arrived() {return game.lemmingArrived(pos);}
 
 	@Override
 	public String getIcon() {
@@ -115,7 +123,7 @@ public class Lemming extends GameObject{
 		}
 	
 	public int altura(int k) {
-		Position aux= new Position(pos.getX(),pos.getY()+k);
+		Position aux= new Position(pos.getCol(),pos.getFila()+k);
 		if(game.isSolid(aux) || !dentroDelTablero(aux))
 			return k-1;
 		else
@@ -123,7 +131,7 @@ public class Lemming extends GameObject{
 	}
 	
 	public String toString() {
-		return "("+pos.getX()+","+pos.getY()+") L "+ dir.toString()+
+		return "("+pos.getFila()+","+pos.getCol()+") Lemming "+ dir.toString()+
 				" "+altura(1)+" "+role.getName()+Messages.LINE_SEPARATOR;
 	}
 
@@ -137,10 +145,51 @@ public class Lemming extends GameObject{
 		return  role.interactWith(wall, this);
 	}
 	
-	public boolean interactions() {return game.receiveInteractionsFrom(this);}
+	@Override
+	public boolean interactWith(ExitDoor exit) {
+		if(exit.isInPosition(this.pos)) {
+			this.isAlive=false;
+			game.arrived();
+			return true;
+		}
+		else return false;
+
+	}
 	
 	public boolean wallDown(Wall wall) {
-		Position aux=new Position(pos.getX(),pos.getY()+1);
+		Position aux=new Position(pos.getCol(),pos.getFila()+1);
 		return wall.isInPosition(aux);
 	}
+	
+	private static int getLemmingHeigthFrom(String line) throws ObjectParseException {
+		try {
+			int altura=Integer.parseInt(line);
+			return altura;
+		}
+		catch(NumberFormatException e) {
+			throw new ObjectParseException("Invalid lemming heigth: "+line);
+		}
+	}
+
+	@Override
+	public GameObject parse(String line, GameWorld game) throws OffBoardException, ObjectParseException{
+		String[] words = line.trim().split("\\s+");			
+		if(words[1].equalsIgnoreCase(name)) {
+			try{
+				Position p=Position.getPositionFrom(words[0]);
+				Direction d=Direction.getLemmingDirectionFrom(words[2]); 
+				int altura=Lemming.getLemmingHeigthFrom(words[3]);
+				LemmingRole r=LemmingRoleFactory.getLemmingRoleFrom(words[4]);
+				return new Lemming(game,p,d,altura,r);
+			}
+			catch(OffBoardException e) {
+				throw new OffBoardException(e.getMessage()+line+"\"");
+			}
+			catch(ObjectParseException e) {
+				throw new ObjectParseException(e.getMessage()+line+"\"");
+			}
+		}
+		else
+			return null;
+		}
 }

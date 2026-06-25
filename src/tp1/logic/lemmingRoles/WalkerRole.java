@@ -19,6 +19,15 @@ public class WalkerRole extends AbstractRole{
 		this.fall=0;
 	}
 
+	public WalkerRole(LemmingRole other) {
+		super(name,shortcut,help,icon);	
+		this.fall=other.getFall();
+	}
+	
+	public WalkerRole clone() {
+		return new WalkerRole(this);
+	}
+	
 	public void start( Lemming lemming ) {}
 	 
 	public void play( Lemming lemming ) { lemming.walkOrFall(); }
@@ -40,6 +49,11 @@ public class WalkerRole extends AbstractRole{
 	@Override
 	public void resetFall() {
 		this.fall=0;
+	}
+	
+	@Override
+	public void setFall(int altura) {
+		this.fall=altura;
 	}
 	
 	

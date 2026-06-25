@@ -18,19 +18,34 @@ public class DownCaverRole extends AbstractRole{
 		hasCaved=false;
 	}
 	
+	public DownCaverRole(LemmingRole other) {
+		super(name,shortcut,help,icon);	
+	}
+	
+	public DownCaverRole clone() {
+		return new DownCaverRole(this);
+	}
+	
 	public void start( Lemming lemming ) {
-		if(lemming.isInAir() || !lemming.interactions()) 
+		if(lemming.isInAir() || !hasCaved) 
 			lemming.disableRole();
 	}
 	
 	public void play( Lemming lemming ) {
 		 lemming.downcaver();
-		 this.hasCaved=true;
 	}
 	
 	@Override
 	public boolean interactWith(Wall wall,Lemming owner) {
-		return owner.wallDown(wall);
-		}
+		if(owner.wallDown(wall)) {
+			hasCaved=true;
+			wall.remove();
+			return true;
+			}
+		else {
+			hasCaved=false;
+			return false;
+			}
+	}
 
 }

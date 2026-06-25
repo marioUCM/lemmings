@@ -4,7 +4,7 @@ import tp1.util.MyStringUtils;
 
 public class Messages {
 	
-	public static final String VERSION = "2.2";
+	public static final String VERSION = "3.0";
 
 	public static final String GAME_NAME = "Lemmings";
 
@@ -21,7 +21,8 @@ public class Messages {
 
 	public static final String DEBUG = "[DEBUG] Executing: %s%n";
 	public static final String ERROR = "[ERROR] Error: %s%n";
-	
+	public static final String ERROR2 = "[ERROR] Error: %s";
+
 	// GAME STATUS
 	public static final String NUMBER_OF_CYCLES = "Number of cycles: %s";
 	public static final String NUM_LEMMINGS = "Lemmings in board: %s";
@@ -32,7 +33,7 @@ public class Messages {
 	public static final String GAME_OVER = "Game over";
 	public static final String PLAYER_QUITS = "Player leaves the game";
 	public static final String PLAYER_WINS = "Player wins!";
-	public static final String PLAYER_LOOSES = "Player loses...";
+	public static final String PLAYER_LOOSES = "Player lose...";
 
 	// Position format
 	public static final String POSITION = "(%s,%s)";
@@ -51,6 +52,8 @@ public class Messages {
 	public static final String UNKNOWN_GAME_OBJECT = "Unknown game object: %s";
 	public static final String UNKNOWN_ROLE = "Unknown role: %s";
 	// Errores de commandos:
+	public static final String ERROR_COMMAND_EXECUTE = "Command execute problem";
+	public static final String ERROR_COMMAND_PARSE = "Invalid command parameters";
 	public static final String COMMAND_PARAMETERS_MISSING = "Missing parameters";
 	public static final String COMMAND_INCORRECT_PARAMETER_NUMBER = "Incorrect parameter number";
 	// Errores de ficheros:
@@ -94,6 +97,18 @@ public class Messages {
 	public static final String COMMAND_EXIT_DETAILS = "[e]xit";
 	public static final String COMMAND_EXIT_HELP = "exits the game";
 	
+	//LOAD
+	public static final String COMMAND_LOAD_NAME = "load";
+	public static final String COMMAND_LOAD_SHORTCUT = "l";
+	public static final String COMMAND_LOAD_DETAILS = "[l]oad <fileName>";
+	public static final String COMMAND_LOAD_HELP = "load the game configuration from text file <fileName>";
+
+	//SAVE
+	public static final String COMMAND_SAVE_NAME = "save";
+	public static final String COMMAND_SAVE_SHORTCUT = "s";
+	public static final String COMMAND_SAVE_DETAILS = "[s]ave <fileName>";
+	public static final String COMMAND_SAVE_HELP = "save the actual configuration in text file <fileName>";
+	
 	// HELP
 	public static final String COMMAND_HELP_NAME = "help";
 	public static final String COMMAND_HELP_SHORTCUT = "h";
@@ -112,7 +127,7 @@ public class Messages {
 	public static final String COMMAND_SETROLE_NAME = "setrole";
 	public static final String COMMAND_SETROLE_SHORTCUT = "sr";
 	public static final String COMMAND_SETROLE_DETAILS = "[s]et[R]ole ROLE ROW COL";
-	public static final String COMMAND_SETROLE_HELP = "sets the lemming in position (ROW,COL) to role ROL";
+	public static final String COMMAND_SETROLE_HELP = "sets the lemming in position (ROW,COL) to role ROLE";
 	public static final String COMMAND_SETROLE_ERROR="SetRoleCommand error "
 	+ "(Incorrect position or no object in that position admits that role)";
 	public static final String COMMAND_UNKNOWN_ROLE="Unknown role";

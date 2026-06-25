@@ -15,6 +15,14 @@ public class ParachuterRole extends AbstractRole{
 		super(name,shortcut,help,icon);		
 	}
 	
+	public ParachuterRole(LemmingRole other) {
+		super(name,shortcut,help,icon);	
+	}
+	
+	public ParachuterRole clone() {
+		return new ParachuterRole(this);
+	}
+	
 	@Override
 	public void start( Lemming lemming ) {
 		if(!lemming.isInAir())

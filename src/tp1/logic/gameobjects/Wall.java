@@ -1,28 +1,47 @@
 package tp1.logic.gameobjects;
 
+import tp1.exceptions.ObjectParseException;
+import tp1.exceptions.OffBoardException;
 import tp1.logic.GameWorld;
 import tp1.logic.Position;
 import tp1.logic.lemmingRoles.LemmingRole;
 import tp1.view.Messages;
 
-public class Wall extends GameObject{
+public class Wall extends GameObject {
 
-	public Wall(GameWorld g,Position p) {
-		super(g,p);
+	private static final String name = "Wall";
+
+	public Wall(GameWorld g, Position p) {
+		super(g, p);
 	}
-	
+
+	public Wall() {
+		super();
+	}
+
+	public Wall(Wall other) {
+		super(other.game, other.pos);
+	}
+
+	public Wall clone() {
+		return new Wall(this);
+	}
+
 	@Override
-	public boolean isSolid() {return true;}
-	
+	public boolean isSolid() {
+		return true;
+	}
+
 	@Override
 	public String getIcon() {
 		return Messages.WALL;
 	}
-	
-	@Override
-	public boolean setRole(LemmingRole role) {return false;}
 
-	
+	@Override
+	public boolean setRole(LemmingRole role) {
+		return false;
+	}
+
 	@Override
 	public boolean receiveInteraction(GameItem other) {
 		return other.interactWith(this);
@@ -30,7 +49,28 @@ public class Wall extends GameObject{
 
 	@Override
 	public String toString() {
-		return "("+pos.getX()+","+pos.getY()+") Wall "+Messages.LINE_SEPARATOR;
+		return "(" + pos.getFila() + "," + pos.getCol() + ") Wall " + Messages.LINE_SEPARATOR;
 	}
 
+	@Override
+	public GameObject parse(String line, GameWorld game) throws OffBoardException, ObjectParseException {
+		String[] words = line.trim().split("\\s+");
+		if (words[1].equalsIgnoreCase(name)) {
+			try {
+				Position aux = Position.getPositionFrom(words[0]);
+				return new Wall(game, aux);
+			}
+			catch(OffBoardException e) {
+				throw new OffBoardException(e.getMessage()+line+"\"");
+			}
+			catch(ObjectParseException e) {
+				throw new ObjectParseException(e.getMessage()+line);
+			}
+		} else
+			return null;
+	}
+	
+	public void remove() {
+		this.isAlive=false;
+	}
 }

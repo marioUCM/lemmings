@@ -142,11 +142,17 @@ public class ConsoleView extends GameView {
 	@Override
 	public void showEndMessage() {
 		System.out.println(this.endMessage());
+		
 	}
 
 	@Override
 	public void showError(String message) {
         System.out.println(Messages.ERROR.formatted(message));		
+	}
+	
+	@Override
+	public void showError2(String message) {
+        System.out.println(Messages.ERROR2.formatted(message));		
 	}
 	
 	@Override

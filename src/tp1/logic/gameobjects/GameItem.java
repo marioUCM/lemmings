@@ -12,6 +12,5 @@ public interface GameItem {
 
 	public boolean isSolid();
 	public boolean isAlive();
-	public boolean isExit();
 	public boolean isInPosition(Position pos);
 }

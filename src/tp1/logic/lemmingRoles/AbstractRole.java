@@ -2,6 +2,7 @@ package tp1.logic.lemmingRoles;
 
 import tp1.logic.gameobjects.Lemming;
 import tp1.logic.gameobjects.*;
+
 public abstract class AbstractRole implements LemmingRole{
 	private String name;
 	private String shortcut;
@@ -15,7 +16,7 @@ public abstract class AbstractRole implements LemmingRole{
 		this.icon=icon;
 	}
 	
-	public void start( Lemming lemming ) {};
+	public abstract void start( Lemming lemming );
 	public abstract void play( Lemming lemming );
 	public String getIcon( Lemming lemming ) {return icon;}
 	public String getHelp() {return help;	}
@@ -24,6 +25,9 @@ public abstract class AbstractRole implements LemmingRole{
 	public void fall() {}
 	public boolean fallen() {return false;}
 	public void resetFall() {}
+	public void setFall(int altura) {};
+	public int getFall() {return 0;}
+	public abstract LemmingRole clone();
 	
 	public boolean receiveInteraction(GameItem other, Lemming owner) {return other.interactWith(owner);}
 	public boolean interactWith(Lemming receiver, Lemming owner) {return false;}

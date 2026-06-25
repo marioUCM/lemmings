@@ -1,5 +1,7 @@
 package tp1.logic.gameobjects;
 
+import tp1.exceptions.ObjectParseException;
+import tp1.exceptions.OffBoardException;
 import tp1.logic.GameWorld;
 import tp1.logic.Position;
 import tp1.logic.lemmingRoles.LemmingRole;
@@ -7,10 +9,24 @@ import tp1.view.Messages;
 
 public class MetalWall extends GameObject{
 	
+	private static final String name="MetalWall";
+
 	public MetalWall(GameWorld g,Position p) {
 		super(g,p);
 	}
 
+	public MetalWall() {
+		super();
+	}
+
+	public MetalWall(MetalWall other) {
+		super(other.game,other.pos);
+	}
+	
+	public MetalWall clone() {
+		return new MetalWall(this);
+	}
+	
 	public  boolean setRole(LemmingRole role) {return false;}
 
 	public boolean isSolid() {return true;}
@@ -21,10 +37,28 @@ public class MetalWall extends GameObject{
 	public boolean receiveInteraction(GameItem other) {
 		return other.interactWith(this);
 	}
-	
 	@Override
 	public String toString() {
-		return "("+pos.getX()+","+pos.getY()+") MetalWall "+Messages.LINE_SEPARATOR;
+		return "("+pos.getFila()+","+pos.getCol()+") MetalWall "+Messages.LINE_SEPARATOR;
+	}
+
+	@Override
+	public GameObject parse(String line, GameWorld game) throws OffBoardException, ObjectParseException {
+		String[] words = line.trim().split("\\s+");			
+		if(words[1].equalsIgnoreCase(name)) {
+			try{
+				Position aux=Position.getPositionFrom(words[0]);
+				return new MetalWall(game,aux);
+			}
+			catch(OffBoardException e) {
+				throw new OffBoardException(e.getMessage()+line+"\"");
+			}
+			catch(ObjectParseException e) {
+				throw new ObjectParseException(e.getMessage()+line);
+			}
+		}
+		else
+			return null;
 	}
 }
 

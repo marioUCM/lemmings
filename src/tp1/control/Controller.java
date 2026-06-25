@@ -2,10 +2,9 @@ package tp1.control;
 
 import tp1.control.commands.Command;
 import tp1.control.commands.CommandGenerator;
+import tp1.exceptions.CommandException;
 import tp1.logic.Game;
 import tp1.view.GameView;
-import tp1.view.Messages;
-
 
 public class Controller {
 
@@ -17,20 +16,25 @@ public class Controller {
 		this.view = view;
 	}
 
-
 	public void run() {
 		String[] words = null;
 
 		view.showWelcome();
 		view.showGame();
-		while(!game.isFinished()) {
-
-			words = view.getPrompt();
-			Command command = CommandGenerator.parse(words);
-			if (command != null)
+		while (!game.isFinished()) {
+			try {
+				words = view.getPrompt();
+				Command command = CommandGenerator.parse(words);
 				command.execute(game, view);
-			else 
-				view.showError(Messages.UNKNOWN_COMMAND.formatted(words[0]));
+			} catch (CommandException e) {
+				Throwable cause = e.getCause();
+				if (cause != null) {
+					view.showError2(e.getMessage()); // Igual pero sin salto de linea extra
+					view.showError(cause.getMessage());
+				}
+				else view.showError(e.getMessage());
+
+			}
 
 		}
 		view.showEndMessage();

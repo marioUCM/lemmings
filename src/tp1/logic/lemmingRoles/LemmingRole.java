@@ -12,6 +12,9 @@ public interface LemmingRole {
 	 public void fall();
 	 public boolean fallen();
 	 public void resetFall();
+	 public int getFall();
+	 public void setFall(int altura);
+	 public LemmingRole clone();
 	 
 	 public boolean receiveInteraction(GameItem other, Lemming owner);
 	 public boolean interactWith(Lemming receiver, Lemming owner);
