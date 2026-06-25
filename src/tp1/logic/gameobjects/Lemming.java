@@ -1,71 +1,62 @@
 package tp1.logic.gameobjects;
 
-import tp1.logic.Game;
+import tp1.logic.GameWorld;
 import tp1.logic.Direction;
-import tp1.logic.lemmingRoles.WalkerRole;
+import tp1.logic.lemmingRoles.*;
 import tp1.view.Messages;
 import tp1.logic.Position;
 
-public class Lemming {
-	private Position pos;
+public class Lemming extends GameObject{
 	private Direction dir;
-	private boolean isAlive;
-	private Game game;
-	private WalkerRole rol;
+	private LemmingRole role;
 	
-	public Lemming(Game g, Position p) {
-		this.game=g;
-		this.pos=p;
-		this.isAlive=true;
+	public Lemming(GameWorld g, Position p,LemmingRole r) {
+		super(g,p);
 		this.dir=Direction.RIGHT;
-		this.rol=new WalkerRole();
+		this.role=r;
 	}
 	
-	public Lemming() {
-		this.game=new Game(game.getLevel());
-		this.pos=new Position (0,0);
-		this.isAlive=false;
-		this.dir=Direction.NONE;
-		this.rol=new WalkerRole();
-	}
-	
+	@Override
 	public void update() {
+		role.start(this);
 		if(this.isAlive) {
-			rol.play(this);
+			role.play(this);
 		}
 		if(!this.dentroDelTablero(this.pos))
-			this.isAlive=false;
+			isAlive=false;
 	}
 	
 	public void dead() {
-		this.isAlive=false;
+		isAlive=false;
 	}
-	
-	public boolean isAlive() {
-		return this.isAlive;
-	}
-	
+		
 	public boolean isInAir() {
 		return game.isInAir(this.pos);
 	}
 	
+	public void downcaver() {
+		Position aux=new Position(pos.getX(),pos.getY()+1);
+		game.removeWall(aux);
+		pos.operador(0, 1);
+		
+	}
+	
+	public void parachute() {
+		pos.operador(0,1);
+	}
+	
 	public void walkOrFall() {
-		if(game.isExit(this.pos)) {
-			game.lemmingExit();
+		if(game.isInAir(this.pos)) {				
+			role.fall();
+			this.pos.operador(0, 1);
 		}
 		else {
-			if(game.isInAir(this.pos)) {				
-				rol.fall();
-				this.pos.operador(0, 1);
-			}
+			if(role.fallen())
+				this.dead();
 			else {
-				if(rol.fallen())
-					this.dead();
-				else {
-					rol.resetFall();
-					this.move();
-					}
-			}
+				role.resetFall();
+				this.move();
+				}
 		}
 	}
 	
@@ -82,22 +73,37 @@ public class Lemming {
 						p.operador(0, -1);
 					else 
 						if(this.dir.equals(Direction.DOWN))
-							p.operador(0, -1);
+							p.operador(0, 1);
 			if(game.isSolid(p) || p.getX()==0 || p.getX()==10) {
 				if(this.dir.equals(Direction.RIGHT))
 					this.dir=Direction.LEFT;
 				else this.dir=Direction.RIGHT;
 				}
 			else
-				this.pos=p;
+				super.pos=p;
 		}
 	}
 	
-	public boolean isInPosition(Position p) {
-		return p.equals(this.pos);
+	@Override
+	public boolean setRole(LemmingRole rol) { 
+		if(!this.role.getName().equalsIgnoreCase(rol.getName())) {
+			this.role=rol; 
+			return  true;
+		}
+		else return false;
+	}
+
+	public void disableRole() { this.role=new WalkerRole(); }
+	
+	@Override
+	public boolean arrived() {return game.lemmingArrived(pos);}
+
+	@Override
+	public String getIcon() {
+		return role.getIcon(this);
 	}
 	
-	public String getIcon() {
+	public String walkerIcon() {
 		if(this.dir==Direction.LEFT)
 			return Messages.LEMMING_LEFT;
 		
@@ -105,7 +111,7 @@ public class Lemming {
 	}
 	
 	public boolean dentroDelTablero(Position p) {
-		return p.getX()>=0 && p.getY()>=0 && p.getX()<Game.DIM_X && p.getY()<Game.DIM_Y;
+		return game.dentroDelTablero(p);
 		}
 	
 	public int altura(int k) {
@@ -117,10 +123,24 @@ public class Lemming {
 	}
 	
 	public String toString() {
-		return "("+pos.getX()+","+pos.getY()+") L "+ dir.toString()+" "+altura(1)+" "+rol.getName();
+		return "("+pos.getX()+","+pos.getY()+") L "+ dir.toString()+
+				" "+altura(1)+" "+role.getName()+Messages.LINE_SEPARATOR;
+	}
+
+	@Override
+	public boolean receiveInteraction(GameItem other) {
+		return other.interactWith(this);
 	}
 	
-	public boolean isExit() {
-		return this.game.isExit(this.pos);
+	@Override
+	public boolean interactWith(Wall wall) {
+		return  role.interactWith(wall, this);
+	}
+	
+	public boolean interactions() {return game.receiveInteractionsFrom(this);}
+	
+	public boolean wallDown(Wall wall) {
+		Position aux=new Position(pos.getX(),pos.getY()+1);
+		return wall.isInPosition(aux);
 	}
 }

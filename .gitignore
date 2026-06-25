@@ -1,2 +1,23 @@
-bin
-.env
+# 1. Archivos compilados de Java (Lo que lee la máquina)
+*.class
+out/
+bin/
+
+# 2. Archivos de IntelliJ IDEA
+.idea/
+*.iml
+
+# 3. Archivos de Eclipse
+.settings/
+.project
+.classpath
+
+# 4. Archivos de VS Code
+.vscode/
+
+# 5. Archivos temporales o de librerías locales
+lib/
+
+# 6. Archivos invisibles del Sistema Operativo
+.DS_Store
+Thumbs.db

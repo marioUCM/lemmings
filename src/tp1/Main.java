@@ -19,14 +19,18 @@ public class Main {
 	public static void main(String[] args) {
 		// Required to avoid issues with tests
 		Locale.setDefault(Locale.of("es", "ES"));
-
+		
 		try {
 			
-			int nLevel = 0;
+			int nLevel = 1;
+			boolean useColors = false;
 			if (args.length != 0) nLevel = Integer.parseInt(args[0]);
+			if (args.length > 1)
+				if (args[1].equalsIgnoreCase("COLORS"))
+					useColors = true;
 
 			Game game = new Game(nLevel);
-			GameView view = new ConsoleView(game);
+            GameView view = useColors ? new ConsoleColorsView(game) : new ConsoleView(game);
 			Controller controller = new Controller(game, view);
 					
 			controller.run();

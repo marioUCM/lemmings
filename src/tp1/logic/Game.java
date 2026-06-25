@@ -1,14 +1,12 @@
 package tp1.logic;
 
 import tp1.logic.gameobjects.*;
-import tp1.view.Messages;
+import tp1.logic.lemmingRoles.*;
 
-public class Game {
+public class Game implements GameStatus,GameModel,GameWorld{
 
-	public static final int DIM_X = 10;
-	public static final int DIM_Y = 10;
-	
 	private GameObjectContainer container;
+	private static int nLevel;
 	private int currentCycle;					
 	private int numLemmings;
 	private int remaining;
@@ -16,50 +14,52 @@ public class Game {
 	private int lemmingsToWin;
 	private int lemmingsDead;
 	private boolean doExit;
-	private int nLevel;
 
-	public Game(int nLevel) {
-		this.nLevel=nLevel;
-		if (nLevel == 1)
-			initGame1();
-		else if (nLevel == 2)
-			initGame2();
-		else
-			initGame();
+	public Game() {
+		this(nLevel);
 	}
 	
+	public Game(int nLevel) {
+		Game.nLevel=nLevel;
+		if(nLevel==0)
+			initGame();
+		else if(nLevel==1)
+			initGame1();
+			else initGame2();
+	}
+
 	private void initGame() {
 		this.container=new GameObjectContainer();
 		this.currentCycle=0;
+		this.numLemmings=0;
 		this.lemmingsExit=0;
 		this.lemmingsToWin=2;
 		this.lemmingsDead=0;
 		this.doExit=false;
 
-		container.add(new Lemming(this, new Position(9,0)));
-		container.add(new Lemming(this, new Position(2,3)));
-		container.add(new Lemming(this, new Position(0,8)));
-		numLemmings=3;
-		
-		container.add(new Wall(new Position(0,9)));
-		container.add(new Wall(new Position(1,9)));
-		container.add(new Wall(new Position(2,4)));
-		container.add(new Wall(new Position(3,4)));
-		container.add(new Wall(new Position(4,4)));
-		container.add(new Wall(new Position(4,6)));
-		container.add(new Wall(new Position(5,6)));
-		container.add(new Wall(new Position(6,6)));		
-		container.add(new Wall(new Position(7,5)));
-		container.add(new Wall(new Position(7,6)));
-		container.add(new Wall(new Position(8,8)));
-		container.add(new Wall(new Position(8,9)));
-		container.add(new Wall(new Position(8,1)));		
-		container.add(new Wall(new Position(9,1)));
-		container.add(new Wall(new Position(9,9)));
+		container.add(new ExitDoor(this,new Position(4,5)));
 
-		container.add(new ExitDoor(new Position(4,5)));
-		
+		container.add(new Lemming(this, new Position(9,0),new WalkerRole()));
+		container.add(new Lemming(this, new Position(2,3),new WalkerRole()));
+		container.add(new Lemming(this, new Position(0,8),new WalkerRole()));
+		numLemmings = 3;
 		this.remaining=this.numLemmings;
+
+		container.add(new Wall(this,new Position(0,9)));
+		container.add(new Wall(this,new Position(1,9)));
+		container.add(new Wall(this,new Position(2,4)));
+		container.add(new Wall(this,new Position(3,4)));
+		container.add(new Wall(this,new Position(4,4)));
+		container.add(new Wall(this,new Position(4,6)));
+		container.add(new Wall(this,new Position(5,6)));
+		container.add(new Wall(this,new Position(6,6)));		
+		container.add(new Wall(this,new Position(7,5)));
+		container.add(new Wall(this,new Position(7,6)));
+		container.add(new Wall(this,new Position(8,8)));
+		container.add(new Wall(this,new Position(8,9)));
+		container.add(new Wall(this,new Position(8,1)));		
+		container.add(new Wall(this,new Position(9,1)));
+		container.add(new Wall(this,new Position(9,9)));
 	}
 	
 	private void initGame1() {
@@ -70,144 +70,215 @@ public class Game {
 		this.lemmingsDead=0;
 		this.doExit=false;
 
-		container.add(new Lemming(this, new Position(9,0)));
-		container.add(new Lemming(this, new Position(2,3)));
-		container.add(new Lemming(this, new Position(0,8)));
-		container.add(new Lemming(this, new Position(3,3)));
-		numLemmings=4;
-		
-		container.add(new Wall(new Position(0,9)));
-		container.add(new Wall(new Position(1,9)));
-		container.add(new Wall(new Position(2,4)));
-		container.add(new Wall(new Position(3,4)));
-		container.add(new Wall(new Position(4,4)));
-		container.add(new Wall(new Position(4,6)));
-		container.add(new Wall(new Position(5,6)));
-		container.add(new Wall(new Position(6,6)));		
-		container.add(new Wall(new Position(7,5)));
-		container.add(new Wall(new Position(7,6)));
-		container.add(new Wall(new Position(8,8)));
-		container.add(new Wall(new Position(8,9)));
-		container.add(new Wall(new Position(8,1)));		
-		container.add(new Wall(new Position(9,1)));
-		container.add(new Wall(new Position(9,9)));
+		container.add(new ExitDoor(this,new Position(4,5)));
 
-		container.add(new ExitDoor(new Position(4,5)));
-		
+		container.add(new Lemming(this, new Position(9,0),new WalkerRole()));
+		container.add(new Lemming(this, new Position(2,3),new WalkerRole()));
+		container.add(new Lemming(this, new Position(0,8),new WalkerRole()));
+		container.add(new Lemming(this,new Position(3,3),new WalkerRole()));
+		numLemmings =4;
 		this.remaining=this.numLemmings;
+
+		container.add(new Wall(this,new Position(0,9)));
+		container.add(new Wall(this,new Position(1,9)));
+		container.add(new Wall(this,new Position(2,4)));
+		container.add(new Wall(this,new Position(3,4)));
+		container.add(new Wall(this,new Position(4,4)));
+		container.add(new Wall(this,new Position(4,6)));
+		container.add(new Wall(this,new Position(5,6)));
+		container.add(new Wall(this,new Position(6,6)));		
+		container.add(new Wall(this,new Position(7,5)));
+		container.add(new Wall(this,new Position(7,6)));
+		container.add(new Wall(this,new Position(8,8)));
+		container.add(new Wall(this,new Position(8,9)));
+		container.add(new Wall(this,new Position(8,1)));		
+		container.add(new Wall(this,new Position(9,1)));
+		container.add(new Wall(this,new Position(9,9)));
 	}
 
 	private void initGame2() {
-		container = new GameObjectContainer();
-		container.add(new Lemming(this, new Position(4,0)));
-		container.add(new Lemming(this, new Position(5,0)));
-		container.add(new Lemming(this, new Position(6,0)));
-		container.add(new Lemming(this, new Position(7,0)));
-		numLemmings = 4;
-		container.add(new Wall(new Position(2,1)));
-		container.add(new Wall(new Position(3,1)));
-		container.add(new Wall(new Position(4,1)));
-		container.add(new Wall(new Position(5,1)));
-		container.add(new Wall(new Position(6,1)));
-		container.add(new Wall(new Position(7,1)));
-		container.add(new Wall(new Position(5,3)));
-		container.add(new Wall(new Position(6,3)));
-		container.add(new Wall(new Position(7,3)));
-		container.add(new Wall(new Position(3,9)));
-		container.add(new Wall(new Position(4,9)));
-		container.add(new Wall(new Position(5,9)));
-		container.add(new Wall(new Position(6,9)));
-		container.add(new Wall(new Position(7,9)));
-		container.add(new Wall(new Position(3,8)));
-		container.add(new Wall(new Position(9,4)));
-		container.add(new ExitDoor(new Position(7,8)));
-		this.remaining = this.numLemmings;
+		this.container=new GameObjectContainer();
 		this.currentCycle=0;
-		this.doExit=false;
-		this.lemmingsDead=0;
-		this.lemmingsToWin=2;
 		this.lemmingsExit=0;
-		
-	}
+		this.lemmingsToWin=2;
+		this.lemmingsDead=0;
+		this.doExit=false;
 
+		container.add(new ExitDoor(this,new Position(4,5)));
+
+		container.add(new Lemming(this, new Position(9,0),new WalkerRole()));
+		container.add(new Lemming(this, new Position(2,3),new WalkerRole()));
+		container.add(new Lemming(this, new Position(0,8),new WalkerRole()));
+		container.add(new Lemming(this, new Position(3,3),new WalkerRole()));
+		container.add(new Lemming(this, new Position(6,0),new WalkerRole()));
+		container.add(new Lemming(this, new Position(6,0),new ParachuterRole()));
+		this.numLemmings = 6;
+		this.remaining=this.numLemmings;
+
+		container.add(new Wall(this,new Position(0,9)));
+		container.add(new Wall(this,new Position(1,9)));
+		container.add(new Wall(this,new Position(2,4)));
+		container.add(new Wall(this,new Position(3,4)));
+		container.add(new Wall(this,new Position(4,4)));
+		container.add(new Wall(this,new Position(4,6)));
+		container.add(new Wall(this,new Position(5,6)));
+		container.add(new Wall(this,new Position(6,6)));		
+		container.add(new Wall(this,new Position(7,5)));
+		container.add(new Wall(this,new Position(7,6)));
+		container.add(new Wall(this,new Position(8,8)));
+		container.add(new Wall(this,new Position(8,9)));
+		container.add(new Wall(this,new Position(8,1)));		
+		container.add(new Wall(this,new Position(9,1)));
+		container.add(new Wall(this,new Position(9,9)));
+		container.add(new Wall(this,new Position(3,5)));
+		container.add(new MetalWall(this,new Position(3,6)));
+	}	
+	
+	//------------------------
+	
+	// GameStatus methods
+		
+	@Override
 	public int getCycle() {
 		return this.currentCycle;
 	}
 
-	public int getLevel() { return this.nLevel; }
-
+	@Override
 	public int numLemmingsInBoard() {
 		return this.remaining;
 	}
 
+	@Override
 	public int numLemmingsDead() {
 		return this.lemmingsDead;
 	}
 
+	@Override
 	public int numLemmingsExit() {
 		return this.lemmingsExit;
 	}
 
+	@Override
 	public int numLemmingsToWin() {
 		return this.lemmingsToWin;
 	}
 
+	@Override
 	public String positionToString(int col, int row) {
 		return this.container.positionToString(new Position(col,row));
 	}
 
+	@Override
 	public boolean playerWins() {
-		return this.lemmingsExit>=this.lemmingsToWin;
+		return this.lemmingsExit>=this.lemmingsToWin & this.remaining==0;
 	}
 
+	@Override
 	public boolean playerLooses() {
 		return lemmingsExit+this.remaining<this.lemmingsToWin;
 	}
 
-	public String help() {
-		return Messages.HELP;
+	// GameModel methods
+		
+	@Override
+	public void removeLemmingArrived() {
+		int arrived=this.container.removeArrived();
+		this.lemmingsExit+=arrived;
+		this.remaining-=arrived;
 	}
 	
+	@Override
+	public void removeLemmingDead() {
+		int dead=this.container.removeDead();
+		this.lemmingsDead+=dead;
+		this.remaining-=dead;
+	}
+	
+	@Override
+	public boolean reset(int level) {
+		if(level==-1) {
+			if(nLevel==0)
+				initGame();
+			else if(nLevel==1)
+				initGame1();
+			else initGame2();
+			return true;
+			}
+		else {
+			switch (level) {
+			case 0:
+				initGame();
+				return true;
+			case 1:
+				initGame1();
+				return true;
+			case 2:
+				initGame2();
+				return true;
+			default:
+				return false;
+			}
+		}
+	}	
+	
+	@Override
+	public void update() {
+		this.removeLemmingArrived();
+		container.update();
+		this.removeLemmingDead();	
+		this.currentCycle++;
+		if(this.remaining==0)
+			this.doExit=true;
+	}
+	
+	@Override
+	public void exit() {this.doExit=true;}
+	
+	@Override
+	public boolean isFinished() {return this.doExit;}
+	
+	@Override
+	public boolean setRole(LemmingRole role,Position pos) {
+		return container.setRole( role, pos);
+	}
+
+	// GameWorld methods (callbacks)
+		
+	@Override
 	public boolean isInAir(Position pos) {
 		Position aux=new Position(pos.getX(),pos.getY());
 		aux.operador(0,1);
 		return !this.container.isSolid(aux);
 	}
 	
+	@Override
 	public boolean isSolid(Position pos) {
 		return this.container.isSolid(pos);
 	}
 	
-	public boolean isExit(Position pos) {
+	@Override
+	public boolean lemmingArrived(Position pos) {
 		return this.container.isExit(pos);
 	}
 	
-	public boolean isFinished() {
-		return this.doExit;
+	@Override
+	public boolean dentroDelTablero(Position p) {
+		return p.getX()>=0 && p.getY()>=0 && p.getX()<DIM_X && p.getY()<DIM_Y;
+	}
+
+	@Override
+	public boolean receiveInteractionsFrom(GameItem obj) {
+		return container.receiveInteractionsFrom(obj);
 	}
 	
-	public void update() {	
-		this.lemmingExit();
-		container.update();
-		this.lemmingDead();	
-		this.currentCycle++;
-		if(this.remaining==0)
-			this.doExit=true;
+	@Override 
+	public void removeWall(Position pos) {
+		container.removeWall(pos);
 	}
-	
-	public void lemmingExit() {
-		this.lemmingsExit+=container.numLemmingsExit();
-		this.remaining-=container.numLemmingsExit();
-		this.container.removeExit();
+
+	// Other methods
+	public String toString() {
+			return container.toString();
 	}
-	
-	public void lemmingDead() {
-		this.lemmingsDead+=container.numLemmingsDead();
-		this.remaining-=container.numLemmingsDead();
-		this.container.removeDead();
-	}
-	
-	public void finish() {
-		this.doExit=true;
-	}
+
 }

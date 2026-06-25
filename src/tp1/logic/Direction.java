@@ -1,9 +1,5 @@
 package tp1.logic;
 
-/**
- * Represents the allowed directions in the game
- *
- */
 public enum Direction {
 	LEFT(-1,0), RIGHT(1,0), DOWN(0,1), UP(0,-1), NONE(0,0);
 	

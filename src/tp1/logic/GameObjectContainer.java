@@ -1,104 +1,105 @@
 package tp1.logic;
 
-import tp1.logic.gameobjects.*;
-import tp1.view.Messages;
+import java.util.ArrayList;
+import java.util.List;
+
+import tp1.logic.gameobjects.GameObject;
+import tp1.logic.gameobjects.GameItem;
+import tp1.logic.lemmingRoles.LemmingRole;
 
 public class GameObjectContainer {
-	public static final int MAX_LEMMINGS=100;
-	private Lemming[] lemmings;
-	private int numLemmings;
-	private Wall[] walls;
-	private int numWalls;
-	private ExitDoor[] doors;
-	private int numExitDoors;
+
+	private List<GameObject> objects;
+
+	public GameObjectContainer() {objects = new ArrayList<GameObject>();}
 	
-	public GameObjectContainer() {
-		this.numLemmings=0;
-		this.lemmings=new Lemming[100];
-		this.numWalls=0;
-		this.walls=new Wall[100];
-		this.numExitDoors=0;
-		this.doors=new ExitDoor[100];
+	public void add(GameObject object) {
+		objects.add(object);
 	}
 	
-	public void add(Lemming lemming) {
-		this.lemmings[numLemmings]=lemming;
-		this.numLemmings++;
-	}
-	public void add(Wall wall) {
-		this.walls[numWalls]=wall;
-		this.numWalls++;
-	}
-	public void add(ExitDoor door) {
-		this.doors[numExitDoors]=door;
-		this.numExitDoors++;
+	public String positionToString(Position pos) {
+		String salida="";
+		for(GameObject o: objects) {
+			if(o.isInPosition(pos))
+				salida+=o.getIcon();
+		}
+		return salida;
+
 	}
 	
 	public void update() {
-		for(int i =0;i<this.numLemmings;i++)
-			lemmings[i].update();
-	}	
-	
-	public String positionToString(Position pos) {
-		if(isSolid(pos))
-			return Messages.WALL;
-		else {
-			String salida="";
-			if(isExit(pos))
-				salida+= Messages.EXIT_DOOR;
-			for(int i=0;i<this.numLemmings;i++)
-					if(this.lemmings[i].isInPosition(pos))
-						salida+= this.lemmings[i].getIcon();
-			return salida;
+		for(int i=0;i<objects.size();i++) {
+			GameObject obj=objects.get(i);
+			obj.update();
 		}
+	};
+	
+	public int removeDead() {
+		int dead=0;
+		for(int i=objects.size()-1;i>=0;i--) {
+			GameObject obj=objects.get(i);
+			if(!obj.isAlive()) {
+				objects.remove(i);
+				dead++;
+				}
+		}
+		return dead;
 	}
 	
-	public void removeDead() {
-		for(int i=numLemmings-1;i>=0;i--)
-			if(!lemmings[i].isAlive()) {
-				for(int j=i;j<numLemmings;j++)
-					this.lemmings[j]=lemmings[j+1];
-				this.numLemmings--;
-			}
+	public int removeArrived() {
+		int arrived=0;
+		for(int i=objects.size()-1;i>=0;i--) {
+			GameObject obj=objects.get(i);
+			if(obj.arrived()) {
+				arrived++;
+				objects.remove(i);
+				}
+		}
+		return arrived;
 	}
-	
-	public void removeExit() {
-		for(int i=numLemmings-1;i>=0;i--)
-			if(lemmings[i].isExit()) {
-				for(int j=i;j<numLemmings;j++)
-					this.lemmings[j]=lemmings[j+1];
-				this.numLemmings--;
-			}
-	}
-	
-	public int numLemmingsDead() {
-		int aux=0;
-		for(int i=0;i<this.numLemmings;i++)
-			if(this.lemmings[i].isAlive()==false)
-				aux++;
-		return aux;
-	}
-	
-	public int numLemmingsExit() {
-		int aux=0;
-		for(int i=0;i<this.numLemmings;i++)
-			if(lemmings[i].isExit())
-				aux++;
-		return aux;
-	}
-
 	
 	public boolean isSolid(Position pos) {
-		for(int i=0;i<this.numWalls;i++)
-			if(this.walls[i].isInPosition(pos))
+		for (GameObject o:objects) {
+			if(o.isSolid() && o.isInPosition(pos))
 				return true;
+		}
 		return false;
 	}
 	
 	public boolean isExit(Position pos) {
-		for(int i=0;i<this.numExitDoors;i++)
-			if(this.doors[i].isInPosition(pos))
+		for (GameObject o:objects) {
+			if(o.isExit() && o.isInPosition(pos))
 				return true;
+		}
 		return false;
+	}
+	
+	public boolean setRole(LemmingRole role,Position pos) {
+		for(GameObject o:objects) {
+			if(o.isInPosition(pos) && o.setRole(role))
+				return true;		
+		}
+		return false;
+	}
+
+	public boolean receiveInteractionsFrom(GameItem obj) {
+		  for(GameObject o:objects) {
+			  if (o.receiveInteraction(obj))
+				  return true;
+		  }
+		  return false;
+	}
+
+	public void removeWall(Position pos) {
+		for(int i=objects.size()-1;i>=0;i--)
+			if(objects.get(i).isInPosition(pos) && objects.get(i).isSolid())
+				objects.remove(i);
+	}
+	
+	public String toString() {
+		StringBuilder result=new StringBuilder();
+		for(GameObject o:objects)
+			result.append(o.toString());
+		return result.toString();
 	}
 }
